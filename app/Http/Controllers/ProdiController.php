@@ -2,60 +2,63 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Prodi;
+
+use Illuminate\Http\Request;
 
 class ProdiController extends Controller
 {
-    
-public function index()
-{
-    $prodis = Prodi::orderBy('id', 'desc')->get();
-    return view('prodi.index', compact('prodis'));
-}
+    public function index(Request $request)
+    {
+        $search = $request->input('search');
+        $prodis = Prodi::where('nama', 'like', '%' . $search . '%')->orderBy('id', 'desc')->get();
 
-public function create()
-{
-    return view('prodi.create');
-}
+        return view('prodi.index', compact('prodis', 'search'));
+    }
 
-public function save(Request $request)
-{
-    $request->validate([
-        'nama' => 'required'
-    ]);
+    public function create()
+    {
+        return view('prodi.create');
+    }
 
-    Prodi::create([
-        'nama' => $request->nama
-    ]);
-    return redirect()->route('/prodi')->with('success', 'Program Studi berhasil ditambahkan');
-}
+    public function save(Request $request)
+    {
+        $request->validate([
+            'nama' => 'required'
+        ]);
 
-public function edit ($id)
-{
-    $prodi = Prodi::findOrFail($id);
-    return view('prodi.edit', compact('/prodi'));
-}
+        Prodi::create([
+            'nama' => $request->nama
+        ]);
 
-public function update(Request $request, $id)
-{
-    $request->validate([
-        'nama' => 'required'
-    ]);
+        return redirect()->route('/prodi')->with('success', 'Program Studi berhasil ditambahkan');
+    }
 
-    $prodi = Prodi::findOrFail($id);
-    $prodi->update([
-        'nama' => $request->nama
-    ]);
-    return redirect()->route('/prodi')->with('success', 'Program Studi berhasil diupdated');
-}
+    public function edit($id)
+    {
+        $prodi = Prodi::findOrFail($id);
+        return view('prodi.edit', compact('prodi'));
+    }
 
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'nama' => 'required'
+        ]);
 
-public function delete ($id)
-{
-    $prodi = Prodi::findOrFail($id);
-    $prodi->delete();
+        $prodi = Prodi::findOrFail($id);
+        $prodi->update([
+            'nama' => $request->nama
+        ]);
 
-    return redirect()->route('/prodi')->with('success', 'Data Program Studi berhasil dihapus');
-}
+        return redirect()->route('/prodi')->with('success', 'Program Studi berhasil diupdated');
+    }
+
+    public function delete($id)
+    {
+        $prodi = Prodi::findOrFail($id);
+        $prodi->delete();
+
+        return redirect()->route('/prodi')->with('success', 'Data Program Studi berhasil dihapus');
+    }
 }
